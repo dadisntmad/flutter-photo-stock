@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:photos/screens/main_screen.dart';
+import 'package:photos/navigation/navigation.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -8,6 +8,8 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static final navigation = Navigation();
+
   const MyApp({super.key});
 
   @override
@@ -19,7 +21,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      routes: navigation.routes,
+      initialRoute: NavigationRoute.main,
+      onGenerateRoute: navigation.onGenerateRoute,
     );
   }
 }

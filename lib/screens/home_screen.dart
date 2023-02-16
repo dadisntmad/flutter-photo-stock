@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:photos/view_models/home_view_model.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<HomeViewModel>().getSinglePhoto();
+    context.read<HomeViewModel>().getListPhotos();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final model = context.watch<HomeViewModel>();
+
+    const textStyle = TextStyle(color: Colors.white);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -27,6 +45,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          final photo = model.singlePhoto;
           return [
             SliverToBoxAdapter(
               child: Container(
@@ -34,8 +53,8 @@ class HomeScreen extends StatelessWidget {
                 height: 250,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: const NetworkImage(
-                      'https://images.unsplash.com/photo-1676290736072-a8be16a18eae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyNTR8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+                    image: NetworkImage(
+                      '${photo?.urls.regular}',
                     ),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
@@ -48,27 +67,18 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 14, bottom: 14),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: const [
-                      Text(
-                        'Photo',
-                        style: TextStyle(
-                          color: Colors.white,
+                    children: [
+                      GestureDetector(
+                        onTap: () {},
+                        child: const Text(
+                          'Photo',
+                          style: textStyle,
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Text(
-                        'by',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'username',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
+                      const SizedBox(width: 4),
+                      const Text('by', style: textStyle),
+                      const SizedBox(width: 4),
+                      Text('${photo?.user.username}', style: textStyle),
                     ],
                   ),
                 ),
@@ -77,16 +87,43 @@ class HomeScreen extends StatelessWidget {
           ];
         },
         body: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: 30,
+          itemCount: model.photos.length,
           itemBuilder: (BuildContext context, int index) {
-            return SizedBox(
-              height: 50,
-              child: Center(child: Text('Item $index')),
-            );
+            return _ListPhotos(index: index);
           },
         ),
       ),
+    );
+  }
+}
+
+class _ListPhotos extends StatelessWidget {
+  final int index;
+  const _ListPhotos({Key? key, required this.index}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = context.read<HomeViewModel>();
+    final photo = model.photos[index];
+    return Stack(
+      alignment: Alignment.bottomLeft,
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: Image.network(
+            photo.urls.regular,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 10, bottom: 10),
+          child: Text(
+            photo.user.username,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

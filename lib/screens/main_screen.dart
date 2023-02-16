@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:photos/screens/home_screen.dart';
+import 'package:photos/utils/screen_helper.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -9,6 +9,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final _screenHelper = ScreenHelper();
+
   int _currentIndex = 0;
 
   void _onIndexChanged(int index) {
@@ -23,9 +25,9 @@ class _MainScreenState extends State<MainScreen> {
       body: SafeArea(
         child: IndexedStack(
           index: _currentIndex,
-          children: const [
-            HomeScreen(),
-            Text('Search'),
+          children: [
+            _screenHelper.homeScreen(),
+            const Text('Search'),
           ],
         ),
       ),
