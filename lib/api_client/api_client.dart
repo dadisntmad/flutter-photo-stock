@@ -9,6 +9,7 @@ class ApiClient {
   final _httpClient = http.Client();
   final _apiKey = dotenv.env['API_KEY'];
   static const _baseUrl = 'https://api.unsplash.com';
+  final int LIMIT = 15;
 
   Future<SinglePhoto> fetchSinglePhoto() async {
     final response = await _httpClient.get(Uri.parse(
@@ -22,9 +23,9 @@ class ApiClient {
     }
   }
 
-  Future<List<ListPhotos>> fetchPhotos() async {
-    final response =
-        await _httpClient.get(Uri.parse('$_baseUrl/photos?client_id=$_apiKey'));
+  Future<List<ListPhotos>> fetchPhotos(int page) async {
+    final response = await _httpClient.get(Uri.parse(
+        '$_baseUrl/photos?page=$page&per_page=$LIMIT&client_id=$_apiKey'));
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body) as List;
       return result.map((photo) => ListPhotos.fromJson(photo)).toList();

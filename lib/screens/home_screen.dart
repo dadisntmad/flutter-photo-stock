@@ -10,11 +10,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     context.read<HomeViewModel>().getSinglePhoto();
     context.read<HomeViewModel>().getListPhotos();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.offset) {
+        context.read<HomeViewModel>().getListPhotos();
+      }
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -87,9 +102,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ];
         },
         body: ListView.builder(
+          controller: _scrollController,
           itemCount: model.photos.length,
           itemBuilder: (BuildContext context, int index) {
-            return _ListPhotos(index: index);
+            if (index < model.photos.length) {
+              return _ListPhotos(index: index);
+            } else {
+              const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                ),
+              );
+            }
           },
         ),
       ),

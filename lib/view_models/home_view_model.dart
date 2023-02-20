@@ -9,11 +9,13 @@ class HomeViewModel extends ChangeNotifier {
   SinglePhoto? _singlePhoto;
   SinglePhoto? get singlePhoto => _singlePhoto;
 
-  List<ListPhotos> _photos = [];
+  final List<ListPhotos> _photos = [];
   List<ListPhotos> get photos => _photos;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  int _currentPage = 0;
 
   Future<void> getSinglePhoto() async {
     _isLoading = true;
@@ -28,7 +30,10 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> getListPhotos() async {
     _isLoading = true;
 
-    _photos = await _apiClient.fetchPhotos();
+    final nextPage = _currentPage += 1;
+
+    final response = await _apiClient.fetchPhotos(nextPage);
+    _photos.addAll(response);
 
     _isLoading = false;
 
