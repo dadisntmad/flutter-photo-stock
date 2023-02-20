@@ -12,6 +12,8 @@ class SinglePhoto {
   final String id;
   @JsonKey(name: 'created_at')
   final String createdAt;
+  final int? width;
+  final int? height;
   final Urls urls;
   final User user;
   final Exif exif;
@@ -20,6 +22,8 @@ class SinglePhoto {
   SinglePhoto({
     required this.id,
     required this.createdAt,
+    required this.width,
+    required this.height,
     required this.urls,
     required this.user,
     required this.exif,

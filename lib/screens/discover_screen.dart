@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photos/mock/categories.dart';
+import 'package:photos/navigation/navigation.dart';
 import 'package:photos/view_models/discover_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -158,7 +159,12 @@ class _ListPhotos extends StatelessWidget {
       alignment: Alignment.bottomLeft,
       children: [
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              NavigationRoute.detailed,
+              arguments: photo.id,
+            );
+          },
           child: Image.network(
             photo.urls.regular,
           ),

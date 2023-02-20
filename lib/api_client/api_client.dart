@@ -45,4 +45,16 @@ class ApiClient {
       throw Exception('Failed to load random photos');
     }
   }
+
+  Future<SinglePhoto> fetchPhotoById(String id) async {
+    final response = await _httpClient
+        .get(Uri.parse('$_baseUrl/photos/$id?client_id=$_apiKey'));
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body) as Map<String, dynamic>;
+      return SinglePhoto.fromJson(result);
+    } else {
+      throw Exception('Failed to load a photo');
+    }
+  }
 }

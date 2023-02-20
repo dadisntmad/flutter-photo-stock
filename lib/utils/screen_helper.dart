@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:photos/screens/discover_screen.dart';
 import 'package:photos/screens/home_screen.dart';
 import 'package:photos/screens/main_screen.dart';
+import 'package:photos/screens/photo_detailed_screen.dart';
 import 'package:photos/view_models/discover_view_model.dart';
 import 'package:photos/view_models/home_view_model.dart';
+import 'package:photos/view_models/photo_detailed_view_model.dart';
 import 'package:provider/provider.dart';
 
 class ScreenHelper {
@@ -22,6 +24,13 @@ class ScreenHelper {
     return ChangeNotifierProvider(
       create: (_) => DiscoverViewModel(),
       child: const DiscoverScreen(),
+    );
+  }
+
+  Widget detailedScreen(String id) {
+    return ChangeNotifierProvider(
+      create: (_) => PhotoDetailedViewModel(id),
+      child: const PhotoDetailedScreen(),
     );
   }
 }

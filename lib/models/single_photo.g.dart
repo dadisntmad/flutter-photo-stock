@@ -9,6 +9,8 @@ part of 'single_photo.dart';
 SinglePhoto _$SinglePhotoFromJson(Map<String, dynamic> json) => SinglePhoto(
       id: json['id'] as String,
       createdAt: json['created_at'] as String,
+      width: json['width'] as int?,
+      height: json['height'] as int?,
       urls: Urls.fromJson(json['urls'] as Map<String, dynamic>),
       user: User.fromJson(json['user'] as Map<String, dynamic>),
       exif: Exif.fromJson(json['exif'] as Map<String, dynamic>),
@@ -19,6 +21,8 @@ Map<String, dynamic> _$SinglePhotoToJson(SinglePhoto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'created_at': instance.createdAt,
+      'width': instance.width,
+      'height': instance.height,
       'urls': instance.urls,
       'user': instance.user,
       'exif': instance.exif,
