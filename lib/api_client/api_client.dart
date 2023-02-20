@@ -33,4 +33,16 @@ class ApiClient {
       throw Exception('Failed to load list photos');
     }
   }
+
+  Future<List<ListPhotos>> fetchRandomPhotos() async {
+    final response = await _httpClient.get(
+        Uri.parse('$_baseUrl/photos/random?count=$LIMIT&client_id=$_apiKey'));
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body) as List;
+      return result.map((photo) => ListPhotos.fromJson(photo)).toList();
+    } else {
+      throw Exception('Failed to load random photos');
+    }
+  }
 }

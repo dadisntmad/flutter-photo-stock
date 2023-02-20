@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
           index: _currentIndex,
           children: [
             _screenHelper.homeScreen(),
-            const Text('Search'),
+            _screenHelper.discoverScreen(),
           ],
         ),
       ),
