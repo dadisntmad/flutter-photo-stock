@@ -11,31 +11,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     context.read<HomeViewModel>().getSinglePhoto();
     context.read<HomeViewModel>().getListPhotos();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.maxScrollExtent ==
-          _scrollController.offset) {
-        context.read<HomeViewModel>().getListPhotos();
-      }
-    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final model = context.watch<HomeViewModel>();
+
+    final photo = model.singlePhoto;
 
     const textStyle = TextStyle(color: Colors.white);
 
@@ -51,7 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                NavigationRoute.search,
+              );
+            },
             icon: const Icon(
               Icons.search,
               color: Colors.black,
@@ -59,64 +50,60 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          final photo = model.singlePhoto;
-          return [
-            SliverToBoxAdapter(
-              child: Container(
-                width: double.infinity,
-                height: 250,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      '${photo?.urls.regular}',
-                    ),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.3),
-                      BlendMode.darken,
-                    ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: Container(
+              width: double.infinity,
+              height: 250,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                    '${photo?.urls.regular}',
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 14, bottom: 14),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Text(
-                          'Photo',
-                          style: textStyle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text('by', style: textStyle),
-                      const SizedBox(width: 4),
-                      Text('${photo?.user.username}', style: textStyle),
-                    ],
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.3),
+                    BlendMode.darken,
                   ),
                 ),
               ),
-            ),
-          ];
-        },
-        body: ListView.builder(
-          controller: _scrollController,
-          itemCount: model.photos.length,
-          itemBuilder: (BuildContext context, int index) {
-            if (index < model.photos.length) {
-              return _ListPhotos(index: index);
-            } else {
-              const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.black,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 14, bottom: 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          NavigationRoute.detailed,
+                          arguments: photo?.id,
+                        );
+                      },
+                      child: const Text(
+                        'Photo',
+                        style: textStyle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text('by', style: textStyle),
+                    const SizedBox(width: 4),
+                    Text('${photo?.user.username}', style: textStyle),
+                  ],
                 ),
-              );
-            }
-          },
-        ),
+              ),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                model.loadNextPage(index);
+                return _ListPhotos(index: index);
+              },
+              childCount: model.photos.length,
+            ),
+          ),
+        ],
       ),
     );
   }

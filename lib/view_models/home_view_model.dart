@@ -39,4 +39,9 @@ class HomeViewModel extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void loadNextPage(int index) {
+    if (index < _photos.length - 1) return;
+    getListPhotos();
+  }
 }

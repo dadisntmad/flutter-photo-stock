@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:photos/models/list_photos.dart';
+import 'package:photos/models/search.dart';
 import 'package:photos/models/single_photo.dart';
 
 class ApiClient {
@@ -55,6 +56,18 @@ class ApiClient {
       return SinglePhoto.fromJson(result);
     } else {
       throw Exception('Failed to load a photo');
+    }
+  }
+
+  Future<Search> fetchSearchResult(String query, int page) async {
+    final response = await _httpClient.get(Uri.parse(
+        'https://api.unsplash.com/search/photos?query=$query&page=$page&per_page=$LIMIT&client_id=$_apiKey'));
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body) as Map<String, dynamic>;
+      return Search.fromJson(result);
+    } else {
+      throw Exception('Failed to load search result');
     }
   }
 }

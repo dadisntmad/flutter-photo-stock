@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photos/mock/categories.dart';
 import 'package:photos/navigation/navigation.dart';
+import 'package:photos/utils/screen_helper.dart';
 import 'package:photos/view_models/discover_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -13,10 +14,22 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
+  final _screenHelper = ScreenHelper();
+
+  final TextEditingController _searchController = TextEditingController();
+
+  bool _isSearchMode = false;
+
   @override
   void initState() {
     context.read<DiscoverViewModel>().getPhotos();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -27,51 +40,72 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const _AppBarContent(),
-      ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: _CategoryList(),
-          ),
-          SliverMasonryGrid.count(
-            childCount: model.photos.length,
-            crossAxisCount: 2,
-            itemBuilder: (BuildContext context, int index) {
-              return _ListPhotos(index: index);
+        title: SizedBox(
+          width: double.infinity,
+          height: 40,
+          child: TextField(
+            onTap: () {
+              setState(() {
+                _isSearchMode = true;
+              });
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
+            controller: _searchController,
+            onEditingComplete: () {
+              if (_searchController.text.trim().isEmpty) return;
 
-class _AppBarContent extends StatelessWidget {
-  const _AppBarContent({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 40,
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(
-              width: 0,
-              style: BorderStyle.none,
+              Navigator.of(context).pushNamed(
+                NavigationRoute.searchResult,
+                arguments: _searchController.text,
+              );
+            },
+            decoration: InputDecoration(
+              hintText: 'Search',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(
+                  width: 0,
+                  style: BorderStyle.none,
+                ),
+              ),
+              filled: true,
+              isDense: true,
+              contentPadding: const EdgeInsets.all(8),
             ),
           ),
-          filled: true,
-          isDense: true,
-          contentPadding: const EdgeInsets.all(8),
         ),
+        actions: _isSearchMode
+            ? [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSearchMode = false;
+                      _searchController.clear();
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.black,
+                  ),
+                ),
+              ]
+            : null,
       ),
+      body: _isSearchMode
+          ? _screenHelper.searchScreen()
+          : CustomScrollView(
+              slivers: <Widget>[
+                const SliverToBoxAdapter(
+                  child: _CategoryList(),
+                ),
+                SliverMasonryGrid.count(
+                  childCount: model.photos.length,
+                  crossAxisCount: 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _ListPhotos(index: index);
+                  },
+                ),
+              ],
+            ),
     );
   }
 }
@@ -109,7 +143,10 @@ class _CategoryList extends StatelessWidget {
                 final category = categories[index];
                 return GestureDetector(
                   onTap: () {
-                    print(category.text);
+                    Navigator.of(context).pushNamed(
+                      NavigationRoute.searchResult,
+                      arguments: category.text,
+                    );
                   },
                   child: Container(
                     margin: const EdgeInsets.all(4),
